@@ -42,12 +42,13 @@ func (dl *Downloader) Init(url string, conns int, filename string) (uint64, erro
 	dl.conns = conns
 	dl.status = NotStarted
 	resp, err := http.Head(url)
-	if resp.StatusCode != 200 {
-		return 0, errors.New(resp.Status)
-	}
 	if err != nil {
 		return 0, err
 	}
+	if resp.StatusCode != 200 {
+		return 0, errors.New(resp.Status)
+	}
+
 	dl.size, err = strconv.Atoi(resp.Header.Get("Content-Length"))
 
 	if err != nil {
