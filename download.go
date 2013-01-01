@@ -3,13 +3,13 @@
 package download
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
-	"errors"
 )
 
 const (
@@ -21,16 +21,16 @@ const (
 type Status string
 
 type Downloader struct {
-	url      string
-	conns    int
-	file     *os.File
-	size     int
-	parts    []Part
-	start    time.Time
-	end      time.Time
-	done     chan error
-	quit     chan bool
-	status   string
+	url    string
+	conns  int
+	file   *os.File
+	size   int
+	parts  []Part
+	start  time.Time
+	end    time.Time
+	done   chan error
+	quit   chan bool
+	status string
 }
 
 func New() Downloader {
@@ -106,12 +106,12 @@ func (dl Downloader) GetProgress() (status string, total, downloaded int, elapse
 
 func (dl *Downloader) Wait() error {
 	var err error = nil
-	for i:=0 ; i< dl.conns; i++ {
+	for i := 0; i < dl.conns; i++ {
 		e := <-dl.done
 		if e != nil {
 			err = e
 			dl.status = err.Error()
-			for j:=i ; j< dl.conns; j++ {
+			for j := i; j < dl.conns; j++ {
 				dl.quit <- true
 			}
 		}
@@ -159,16 +159,16 @@ func (part *Part) Download(done chan error, quit chan bool) error {
 
 	for {
 		select {
-		case <- quit:
+		case <-quit:
 			return nil
 		default:
 		}
 		/*
-		if part.id == 5 {
-			time.Sleep(time.Second)
-			err = errors.New("Connection reset by peer")
-			return err
-		}
+			if part.id == 5 {
+				time.Sleep(time.Second)
+				err = errors.New("Connection reset by peer")
+				return err
+			}
 		*/
 		nbytes, err := resp.Body.Read(buffer[0:])
 		if err == io.EOF {
