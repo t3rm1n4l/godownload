@@ -17,7 +17,7 @@ func DisplayProgress(dl *download.Downloader) {
 		fmt.Fprintf(os.Stdout, "Downloaded %.2f%% of %s, at %s/s\r", float64(downloaded)*100/float64(total), humanize.Bytes(uint64(total)), humanize.Bytes(uint64(float64(downloaded)/elapsed.Seconds())))
 		switch {
 		case status == download.Completed:
-			fmt.Println("\nSuccessfully completed download")
+			fmt.Println("\nSuccessfully completed download in", elapsed)
 			return
 		case status == download.OnProgress:
 		case status == download.NotStarted:
