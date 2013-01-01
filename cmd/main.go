@@ -31,9 +31,9 @@ func DisplayProgress(dl *download.Downloader) {
 
 func main() {
 
-	var url = flag.String("u", "", "-u http://example.com/file.dmg")
-	var conns = flag.Int("c", 1, "-c 10")
-	var outfile = flag.String("o", "", "-o filename")
+	var url = flag.String("u", "", "Download file url")
+	var conns = flag.Int("c", 1, "Number of connections")
+	var outfile = flag.String("o", "", "Output filename")
 	flag.Parse()
 
 	if *outfile == "" || *url == "" {
