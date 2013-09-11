@@ -142,7 +142,8 @@ type Part struct {
 
 func (part *Part) Download(done chan error, quit chan bool) error {
 	client := http.Client{}
-	buffer := make([]byte, 4096)
+	size := 4096
+	buffer := make([]byte, size)
 	req, err := http.NewRequest("GET", part.url, nil)
 	defer func() {
 		done <- err
@@ -152,11 +153,11 @@ func (part *Part) Download(done chan error, quit chan bool) error {
 		return err
 	}
 	req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", part.offset, part.offset+part.size-1))
-	resp, e := client.Do(req)
-	err = e
+	resp, err := client.Do(req)
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	for {
 		select {
@@ -164,16 +165,9 @@ func (part *Part) Download(done chan error, quit chan bool) error {
 			return nil
 		default:
 		}
-		/*
-			if part.id == 5 {
-				time.Sleep(time.Second)
-				err = errors.New("Connection reset by peer")
-				return err
-			}
-		*/
-		nbytes, err := resp.Body.Read(buffer[0:])
+
+		nbytes, err := resp.Body.Read(buffer[0:size])
 		if err == io.EOF {
-			resp.Body.Close()
 			break
 		}
 		if err != nil {
@@ -185,7 +179,13 @@ func (part *Part) Download(done chan error, quit chan bool) error {
 			return nil
 		}
 		part.dlsize += nbytes
-
+		remaining := part.size - part.dlsize
+		switch {
+		case remaining == 0:
+			return nil
+		case remaining < 4096:
+			size = part.size - part.dlsize
+		}
 	}
 
 	return nil

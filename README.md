@@ -2,6 +2,8 @@
 
 A simple parallel downloader package written in go
 
+Benchmark shows that it is faster than aria2c with equal number of splits
+
 ## Usage example
     $ cd cmd
     $ go get github.com/t3rm1n4l/godownload
